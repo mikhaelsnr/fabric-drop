@@ -2,7 +2,7 @@
 
 Configure DEVICES, COMMANDS, polling settings, SMTP_HOST, SMTP_PORT and both recipient lists in credentials.py. FABRIC_DROPS.py imports these settings. All device usernames/passwords and the email login are in local credentials.py: DEVICE_USERNAME and DEVICE_PASSWORD shared by all devices, plus EMAIL_SENDER and EMAIL_PASSWORD. A per-device password overrides DEVICE_PASSWORD. Existing local credentials were preserved. credentials.py can be committed as sanitized configuration with placeholders. Fill in local credentials and device settings before running; keep actual passwords out of commits.
 
-The send_email function stays in email_sender.py. Keep both files beside FABRIC_DROPS.py; the main script imports them automatically. Keep real passwords out of Git commits.
+The send_email function is included in FABRIC_DROPS.py. Keep credentials.py beside the main script. Keep real passwords out of Git commits.
 
 Run `python FABRIC_DROPS.py`. No ServiceNow dependency or API call is included.
 
@@ -20,7 +20,7 @@ One monitoring-team email is attempted each cycle that has a successful device p
 - Successful polls with no current alarms: No Fabric Drop Alarm Found on BNG/CGNAT. Results apply only to listed successful devices.
 - No successful polls, but unreachable devices: Fabric Drop Monitor - Connectivity Information.
 
-The body lists successfully polled FPC values, clear transitions, and a separate Connectivity Information section for unreachable devices with Fabric Drop Status: NOT AVAILABLE. SSH authentication, session, credential, hostname and parser failures are excluded. If all devices have only those technical failures, no monitoring-team email is sent.
+When all devices are successfully polled with zero counters, the body is: "No changes in fabric drop alarms were detected across all BNG/CGNAT devices." Clear transitions still update JSON and MYCOM events. Otherwise, the body lists successfully polled FPC values, clear transitions, and a separate Connectivity Information section for unreachable devices with Fabric Drop Status: NOT AVAILABLE. SSH authentication, session, credential, hostname and parser failures are excluded. If all devices have only those technical failures, no monitoring-team email is sent.
 
 One aggregated admin email is attempted when any device has MONITORING_ERROR, including unreachable devices. Cycle/state failures also trigger an admin-only notification. Configure ADMIN_EMAIL_RECIPIENTS before production: the default is empty and logs a delivery failure. SMTP failures are logged and return failure; an unavailable SMTP service cannot deliver its own error report.
 

@@ -4,7 +4,8 @@ import copy
 from datetime import datetime, timezone
 import json
 import logging
-from email_sender import send_email
+from email.mime.text import MIMEText
+import smtplib
 from credentials import DEVICE_PASSWORD, DEVICE_USERNAME, EMAIL_SENDER, EMAIL_PASSWORD
 from credentials import (
     SMTP_HOST, SMTP_PORT, MONITORING_EMAIL_RECIPIENTS, ADMIN_EMAIL_RECIPIENTS,
@@ -211,6 +212,8 @@ def build_reports(results, events):
             sections.append('Connectivity Information\n\n' + '\n\n'.join(
                 f"Device/IP: {r['host']}\nStatus: UNREACHABLE\nFabric Drop Status: NOT AVAILABLE\n"
                 'Fabric Drop status could not be determined for this device.' for r in unreachable))
+        if not errors and not alarm:
+            sections = ['No changes in fabric drop alarms were detected across all BNG/CGNAT devices.']
         monitoring = subject, '\n\n'.join(sections)
     admin = None
     if errors:
@@ -223,6 +226,31 @@ def build_reports(results, events):
 
 
 
+
+
+def send_email(subject, body, sender_email, receiver_email, *, password, smtp_host, smtp_port):
+    """Return delivery success and log failures without exposing SMTP credentials."""
+    if not receiver_email:
+        LOGGER.error('Email not sent: recipient list is empty (%s)', subject)
+        return False
+    try:
+        if not password or password == '<email password>':
+            LOGGER.error('Email credentials missing')
+            return False
+        message = MIMEText(body)
+        message['Subject'], message['From'] = subject, sender_email
+        message['To'] = ', '.join(receiver_email)
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=30) as server:
+            server.login(sender_email, password)
+            refused = server.sendmail(sender_email, receiver_email, message.as_string())
+        if refused:
+            LOGGER.error('Email rejected for one or more recipients')
+            return False
+        LOGGER.info('Email sent: %s', subject)
+        return True
+    except Exception as exc:
+        LOGGER.error('Email failed (%s)', type(exc).__name__)
+        return False
 
 
 def main():
