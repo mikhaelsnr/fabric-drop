@@ -1,6 +1,6 @@
 # Fabric Drop monitor turnover
 
-Configure DEVICES, COMMANDS, polling settings, SMTP_HOST, SMTP_PORT and both recipient lists in credentials.py. FABRIC_DROPS.py imports these settings. All device usernames/passwords and the email login are in local credentials.py: DEVICE_USERNAME and DEVICE_PASSWORD shared by all devices, plus EMAIL_SENDER and EMAIL_PASSWORD. A per-device password overrides DEVICE_PASSWORD. Existing local credentials were preserved. credentials.py is ignored by Git; on a fresh checkout, create it with the credentials and all SMTP, recipient, device, command and polling settings imported by FABRIC_DROPS.py.
+Configure DEVICES, COMMANDS, polling settings, SMTP_HOST, SMTP_PORT and both recipient lists in credentials.py. FABRIC_DROPS.py imports these settings. All device usernames/passwords and the email login are in local credentials.py: DEVICE_USERNAME and DEVICE_PASSWORD shared by all devices, plus EMAIL_SENDER and EMAIL_PASSWORD. A per-device password overrides DEVICE_PASSWORD. Existing local credentials were preserved. credentials.py can be committed as sanitized configuration with placeholders. Fill in local credentials and device settings before running; keep actual passwords out of commits.
 
 The send_email function stays in email_sender.py. Keep both files beside FABRIC_DROPS.py; the main script imports them automatically. Keep real passwords out of Git commits.
 
