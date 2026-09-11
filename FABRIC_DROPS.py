@@ -83,7 +83,7 @@ def send_email(subject, body, sender_email, receiver_email):
 
 def main():
     devices = [
-        {'device_type': 'juniper_junos', 'host': '10.166.38.209', 'username': '10012272'},
+        {'device_type': 'juniper_junos', 'host': '<host IP>', 'username': '<username>'},
     ]
 
 
